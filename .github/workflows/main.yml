@@ -1,5 +1,6 @@
 name: Deploy to Cloud Run
 
+# environment variables is added
 env:
   SERVICE_NAME: react-app1
 
