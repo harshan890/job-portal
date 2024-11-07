@@ -47,6 +47,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: task-definition-updated.json
-          service: service_ecs         # Replace with your ECS service name
-          cluster: ECS-dev             # Replace with your ECS cluster name
+          service: service-last         # Replace with your ECS service name
+          cluster: my-cluster-apps            # Replace with your ECS cluster name
           wait-for-service-stability: true
