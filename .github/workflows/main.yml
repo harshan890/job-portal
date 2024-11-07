@@ -1,41 +1,43 @@
-name: Deploy to Cloud Run
-
-# environment variables is added
-env:
-  SERVICE_NAME: react-app1
+name: Build and push image to ECR
 
 on:
   push:
     branches:
       - main
+      - "releases/**"
 
 jobs:
-  dockerize-and-deploy:
+  build:
+    name: Build Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.0
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
 
-      - name: Configure Docker
-        run: |
-          gcloud auth configure-docker
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest .
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+      - id: docker-tag
+        uses: yuya-takeyama/docker-tag-from-github-ref-action@v1
 
-      - name: Deploy to Cloud Run
+      - name: Build & Push Docker image
+        id: docker-build
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: react-js/automate
+          # Use the git tag as the image tag.
+          # github.ref format is like `refs/tags/v0.0.1`, so we strip the the
+          # `refs/tags/` prefix and export this for later use.
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.tag }}
         run: |
-          gcloud run deploy $SERVICE_NAME \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest \
-            --platform managed \
-            --region us-central1 \
-            --allow-unauthenticated
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
