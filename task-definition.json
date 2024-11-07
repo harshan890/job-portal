@@ -1,20 +1,20 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-2:730335410181:task-definition/Ecr-to-Ecs:1",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:730335410181:task-definition/ECS_TO_ECR_REVERT:1",
     "containerDefinitions": [
         {
-            "name": "react-js",
+            "name": "react-js-1",
             "image": "730335410181.dkr.ecr.us-east-2.amazonaws.com/react-js/automatess:latest",
             "cpu": 0,
             "portMappings": [
                 {
-                    "name": "react-js-80-tcp",
+                    "name": "react-js-1-80-tcp",
                     "containerPort": 80,
                     "hostPort": 80,
                     "protocol": "tcp",
                     "appProtocol": "http"
                 },
                 {
-                    "name": "react-js-3000-tcp",
+                    "name": "react-js-1-3000-tcp",
                     "containerPort": 3000,
                     "hostPort": 3000,
                     "protocol": "tcp"
@@ -29,7 +29,7 @@
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/Ecr-to-Ecs",
+                    "awslogs-group": "/ecs/ECS_TO_ECR_REVERT",
                     "mode": "non-blocking",
                     "awslogs-create-group": "true",
                     "max-buffer-size": "25m",
@@ -41,7 +41,7 @@
             "systemControls": []
         }
     ],
-    "family": "Ecr-to-Ecs",
+    "family": "ECS_TO_ECR_REVERT",
     "executionRoleArn": "arn:aws:iam::730335410181:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
     "revision": 1,
@@ -90,7 +90,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-11-07T11:49:30.873Z",
+    "registeredAt": "2024-11-07T14:57:39.618Z",
     "registeredBy": "arn:aws:iam::730335410181:root",
     "tags": []
 }
