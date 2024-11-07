@@ -1,29 +1,43 @@
+name: Build and push image to ECR
+
+on:
+  push:
+    branches:
+      - main
+      - "releases/**"
+
 jobs:
   build:
+    name: Build Image
     runs-on: ubuntu-latest
-    steps:
 
-      - name: Checkout repository
+    steps:
+      - name: Check out code
         uses: actions/checkout@v2
-    
-      - name: Set build number
-        id: set_build_number
-        run: echo "::set-output name=BUILD_NUMBER::${GITHUB_RUN_NUMBER}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
 
       - name: Login to Amazon ECR
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 730335410181.dkr.ecr.us-east-2.amazonaws.com
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Docker image
-        run: |
-          docker build -t react:${{ steps.set_build_number.outputs.BUILD_NUMBER }} .
-      
-      - name: Tag Docker image for ECR
-        run: |
-          docker tag react:${{ steps.set_build_number.outputs.BUILD_NUMBER }} 730335410181.dkr.ecr.us-east-2.amazonaws.com/react-js/automatess: ${{ steps.set_build_number.outputs.BUILD_NUMBER }}
+      - id: docker-tag
+        uses: yuya-takeyama/docker-tag-from-github-ref-action@v1
 
-      - name: Push Docker image to Amazon ECR
+      - name: Build & Push Docker image
+        id: docker-build
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: react-js/automatess
+          # Use the git tag as the image tag.
+          # github.ref format is like `refs/tags/v0.0.1`, so we strip the the
+          # `refs/tags/` prefix and export this for later use.
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.tag }}
         run: |
-          docker push 730335410181.dkr.ecr.us-east-2.amazonaws.com/react-js/automatess:${{ steps.set_build_number.outputs.BUILD_NUMBER }}
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
