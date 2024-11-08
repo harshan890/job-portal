@@ -10,17 +10,21 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+
       - id: docker-tag
         uses: yuya-takeyama/docker-tag-from-github-ref-action@v1
+
       - name: Build & Push Docker image
         id: docker-build
         env:
@@ -30,15 +34,17 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
       - name: Update ECS task definition
         id: task-def
         run: |
           # Replace <IMAGE> in task-definition.json with the actual ECR image URI
           sed -e 's|<IMAGE>|'${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}'|' task-definition.json > task-definition-updated.json
+
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: task-definition.json
+          task-definition: arn:aws:ecs:us-east-2:730335410181:task-definition/react-last-def:3  # Use your task definition ARN here
           service: services-services         # Replace with your ECS service name
           cluster: react-last                # Replace with your ECS cluster name
           wait-for-service-stability: true
