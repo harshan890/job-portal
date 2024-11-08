@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-2:730335410181:task-definition/cloud-definition:1",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:730335410181:task-definition/cloud-definition:4",
     "containerDefinitions": [
         {
             "name": "cloud-container",
@@ -25,6 +25,16 @@
             "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "AWS_ACCESS_KEY_ID",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:730335410181:secret:harshan-secrets-VIpD3i"
+                },
+                {
+                    "name": "AWS_SECRET_ACCESS_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:730335410181:secret:harshan-secrets-VIpD3i"
+                }
+            ],
             "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
@@ -44,7 +54,7 @@
     "family": "cloud-definition",
     "executionRoleArn": "arn:aws:iam::730335410181:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 1,
+    "revision": 4,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -59,6 +69,9 @@
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.secrets.asm.environment-variables"
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
@@ -90,7 +103,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-11-08T16:46:57.714Z",
+    "registeredAt": "2024-11-08T18:21:31.868Z",
     "registeredBy": "arn:aws:iam::730335410181:root",
     "tags": []
 }
