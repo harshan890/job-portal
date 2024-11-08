@@ -45,7 +45,7 @@ jobs:
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: task-definition.json  # Use your task definition ARN here
+          task-definition: task-definition.json
           service: secret-services-here         # Replace with your ECS service name
           cluster: cloudOpsLtd                   # Replace with your ECS cluster name
           wait-for-service-stability: true
