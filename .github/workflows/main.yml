@@ -31,22 +31,8 @@ jobs:
         id: docker-build
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: react/app
+          ECR_REPOSITORY: react-2/swaps
           IMAGE_TAG: ${{ steps.docker-tag.outputs.tag }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-      - name: Update ECS task definition
-        id: task-def
-        run: |
-          # Replace <IMAGE> in task-definition.json with the actual ECR image URI
-          sed -e 's|<IMAGE>|'${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}'|' task-definition.json > task-definition-updated.json
-
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: task-definition-updated.json
-          service: service-last         # Replace with your ECS service name
-          cluster: my-cluster-apps            # Replace with your ECS cluster name
-          wait-for-service-stability: true
