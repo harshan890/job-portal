@@ -21,12 +21,19 @@
                 }
             ],
             "essential": true,
-            "environment": [],
-            "environmentFiles": [],
+            "environment": [
+                {
+                    "name": "AWS_ACCESS_KEY_ID",
+                    "value": "AKIA2UC3B7ACTB67QAEA"
+                },
+                {
+                    "name": "AWS_SECRET_ACCESS_KEY",
+                    "value": "gkMuu64x2KWc9sOIQS11hJnFIsydJe2LrUzfuIaV"
+                }
+            ],
             "mountPoints": [],
             "volumesFrom": [],
             "readonlyRootFilesystem": false,
-            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
@@ -45,7 +52,7 @@
     "family": "react-last-def",
     "executionRoleArn": "arn:aws:iam::730335410181:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 1,
+    "revision": 3,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -91,7 +98,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-11-08T08:42:10.263Z",
+    "registeredAt": "2024-11-08T11:01:15.611Z",
     "registeredBy": "arn:aws:iam::730335410181:root",
     "tags": []
 }
