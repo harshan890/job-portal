@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-2:730335410181:task-definition/react-last-def:1",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:730335410181:task-definition/react-last-def:3",
     "containerDefinitions": [
         {
             "name": "react-app-last",
