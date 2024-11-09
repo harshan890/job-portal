@@ -1,10 +1,11 @@
 name: Build, Push, and Deploy to ECS
-# Added this
+
 on:
   push:
     branches:
       - main
       - "releases/**"
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -26,6 +27,16 @@ jobs:
       - id: docker-tag
         uses: yuya-takeyama/docker-tag-from-github-ref-action@v1
 
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Fetch secrets from AWS Secrets Manager
+        id: fetch-secrets
+        run: |
+          export SECRETS_JSON=$(aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:us-east-2:730335410181:secret:harshan-secrets-VIpD3i --query SecretString --output text)
+          export AWS_ACCESS_KEY_ID=$(echo $SECRETS_JSON | jq -r '.AWS_ACCESS_KEY_ID')
+          export AWS_SECRET_ACCESS_KEY=$(echo $SECRETS_JSON | jq -r '.AWS_SECRET_ACCESS_KEY')
+
       - name: Build & Push Docker image
         id: docker-build
         env:
@@ -39,13 +50,12 @@ jobs:
       - name: Update ECS task definition
         id: task-def
         run: |
-          # Replace <IMAGE> in task-definition.json with the actual ECR image URI
           sed -e 's|<IMAGE>|'${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}'|' task-definition.json > task-definition-updated.json
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: task-definition.json
+          task-definition: task-definition-updated.json
           service: secret-services-here         # Replace with your ECS service name
           cluster: cloudOpsLtd                   # Replace with your ECS cluster name
           wait-for-service-stability: true
